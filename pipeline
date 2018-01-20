@@ -8,6 +8,8 @@ bamTobw.sh -b <bamlist>
 samtools index *.bam
 #Merge bigwig files
 /home/songjun/miniconda2/bin/bigWigMerge 1.bigWig 2.bigWig merge.bedgraph
+##bedgraphtobigwig
+/project/eheller_itmat_lab/software/bedGraphToBigWig in.bedgraph /project/eheller_itmat_lab/Genome/mm9/mm9.chrom.sizes out.bw
 #bigwig to wig
 /project/eheller_itmat_lab/software/bigWigToWig in.bigWig out.wig
 #wigtoTDF
