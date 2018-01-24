@@ -2,6 +2,11 @@
 #from bamtobw
 /project/eheller_itmat_lab/software/bamTobw-master/bamTobw.sh 
 bamTobw.sh -b <bamlist>
+## normalize bedgraph files
+TmpScale=$(bc <<< "scale=6;1000000/$(samtools view -f 0 -c input.bam)")
+
+
+
 #from bedgraphtobw
 /project/eheller_itmat_lab/software/bedGraphToBigWig input.bedgraph /project/eheller_itmat_lab/Heller/ref/mm9.chrom.sizes output.bw&
 #from bamtobai
@@ -9,7 +14,7 @@ samtools index *.bam
 #Merge bigwig files
 /home/songjun/miniconda2/bin/bigWigMerge 1.bigWig 2.bigWig merge.bedgraph
 ##bedgraphtobigwig
-/project/eheller_itmat_lab/software/bedGraphToBigWig in.bedgraph /project/eheller_itmat_lab/Genome/mm9/mm9.chrom.sizes out.bw
+/project/eheller_itmat_lab/software/bedGraphToBigWig in.bedgraph /project/eheller_itmat_lab/Heller/ref/mm9.chrom.sizes out.bw
 #bigwig to wig
 /project/eheller_itmat_lab/software/bigWigToWig in.bigWig out.wig
 #wigtoTDF
@@ -29,6 +34,12 @@ nohup plotFingerprint -b *.bam  minMappingQuality 30 --skipZeros --numberOfSampl
 #Plotprofile
 /home/songjun/miniconda2/bin/plotProfile -m all_s3eq.gz -out all_s3eq_rows.pdf --numPlotsPerRow 1 --yAxisLabel Mean_ChIP_Tag_Counts
 
+## sort coordinates
+sort -k1,1 -k2,2n nc_001_coords > nc_001_coords.sort
+perl -p -i -e 's/ /\t/g' SE_coords.sort 
+
+##add on both ends. Use Bedtool slop
+sh /project/eheller_itmat_lab/Heller/chip_seq/peak_calling_algorithm/bedtools2/bin/slopBed -i nc_001_coords.sort -g mm9_whole_genome.sort.bed -b 200 > 200_expand_nc_se_coords_sort.bed
 
 ##Bedtools flanking 
 sh /project/eheller_itmat_lab/Heller/chip_seq/peak_calling_algorithm/bedtools2/bin/flankBed -i 1.sort -g ./regions/mm9.ensGene.sort.bed -b 100 > flanking_100_SE_peak_formotif
