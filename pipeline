@@ -1,11 +1,13 @@
 # s3eq chip-seq pipeline
+#samtobam
+#sort bam
 #from bamtobw
 /project/eheller_itmat_lab/software/bamTobw-master/bamTobw.sh 
 bamTobw.sh -b <bamlist>
-## normalize bedgraph files
+## normalize bedgraph files and convert to bigwig
 TmpScale=$(bc <<< "scale=6;1000000/$(samtools view -f 0 -c input.bam)")
-
-
+sh /project/eheller_itmat_lab/Heller/chip_seq/peak_calling_algorithm/bedtools2/bin/genomeCoverageBed -ibam input.bam -bg -scale X -g genome.chrom.sizes > normalised.bg
+/project/eheller_itmat_lab/software/wigToBigWig -clip normalised.bg genome.chrom.sizes normalised.bw
 
 #from bedgraphtobw
 /project/eheller_itmat_lab/software/bedGraphToBigWig input.bedgraph /project/eheller_itmat_lab/Heller/ref/mm9.chrom.sizes output.bw&
