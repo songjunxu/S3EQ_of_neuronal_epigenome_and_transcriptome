@@ -1,0 +1,47 @@
+#from bamtobw
+/project/eheller_itmat_lab/software/bamTobw-master/bamTobw.sh 
+bamTobw.sh -b <bamlist>
+## normalize bedgraph files and convert to bigwig
+TmpScale=$(bc <<< "scale=6;1000000/$(samtools view -f 0 -c input.bam)")
+sh /project/eheller_itmat_lab/Heller/chip_seq/peak_calling_algorithm/bedtools2/bin/genomeCoverageBed -ibam input.bam -bg -scale X -g genome.chrom.sizes > normalised.bg
+/project/eheller_itmat_lab/software/wigToBigWig -clip normalised.bg genome.chrom.sizes normalised.bw
+
+#from bedgraphtobw
+/project/eheller_itmat_lab/software/bedGraphToBigWig input.bedgraph /project/eheller_itmat_lab/Heller/ref/mm9.chrom.sizes output.bw&
+#from bamtobai
+samtools index *.bam
+#Merge bigwig files
+/home/songjun/miniconda2/bin/bigWigMerge 1.bigWig 2.bigWig merge.bedgraph
+##bedgraphtobigwig
+/project/eheller_itmat_lab/software/bedGraphToBigWig in.bedgraph /project/eheller_itmat_lab/Heller/ref/mm9.chrom.sizes out.bw
+#bigwig to wig
+/project/eheller_itmat_lab/software/bigWigToWig in.bigWig out.wig
+#wigtoTDF
+module load java-sdk-1.8.0 
+nohup /project/eheller_itmat_lab/software/IGVTools/igvtools toTDF S3EQ_3.wig S3EQ_3.tdf mm9 &
+
+##Plot Fingerprint 
+nohup plotFingerprint -b *.bam  minMappingQuality 30 --skipZeros --numberOfSamples 50000 -T "Fingerprints of new samples" --plotFile new_fingerprints.png --outRawCounts new_fingerprints.tab &
+
+##Multibigwigsummary
+/home/songjun/miniconda2/bin/multiBigwigSummary bins -b *.bw -out new_scores_per_bin.npz --outRawCounts scores_per_transcript.tab
+##Plot Enrichment
+/home/songjun/miniconda2/bin/plotEnrichment -b *.bam --BED ./regions/*.bed -o enrichment.png 
+
+##Compute matrix
+/home/songjun/miniconda2/bin/computeMatrix scale-regions -b 5000 -a 5000 -R /project/eheller_itmat_lab/Heller/ref/refGene_mm9_genebody.bed -S 2_classic_merged.bw 2_S3EQ_merged.bw input_merged.bw --skipZeros -o test_s3eq3.gz --outFileSortedRegions test_s3eq3.bed
+#Plotprofile
+/home/songjun/miniconda2/bin/plotProfile -m all_s3eq.gz -out all_s3eq_rows.pdf --numPlotsPerRow 1 --yAxisLabel Mean_ChIP_Tag_Counts
+
+## sort coordinates
+sort -k1,1 -k2,2n nc_001_coords > nc_001_coords.sort
+perl -p -i -e 's/ /\t/g' SE_coords.sort 
+
+##add on both ends. Use Bedtool slop
+sh /project/eheller_itmat_lab/Heller/chip_seq/peak_calling_algorithm/bedtools2/bin/slopBed -i nc_001_coords.sort -g mm9_whole_genome.sort.bed -b 200 > 200_expand_nc_se_coords_sort.bed
+
+##Bedtools flanking 
+sh /project/eheller_itmat_lab/Heller/chip_seq/peak_calling_algorithm/bedtools2/bin/flankBed -i 1.sort -g ./regions/mm9.ensGene.sort.bed -b 100 > flanking_100_SE_peak_formotif
+
+##find bed annotation-gene 
+/project/eheller_itmat_lab/software/bedops/bedmap --echo --echo-map-id-uniq SE_Coc.overlap mm9.ensGene.bed > answer.bed
