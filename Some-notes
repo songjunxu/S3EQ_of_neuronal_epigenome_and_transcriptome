@@ -1,4 +1,4 @@
-#from bamtobw
+# from bamtobw
 /project/eheller_itmat_lab/software/bamTobw-master/bamTobw.sh 
 bamTobw.sh -b <bamlist>
 ## normalize bedgraph files and convert to bigwig
