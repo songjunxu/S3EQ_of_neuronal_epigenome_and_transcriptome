@@ -1,9 +1,7 @@
-# General Analysis
-
-## Data Resource
+## General Analysis
+### Data Resource
 GSE117462
-
-## FASTQC of raw reads, generate summary
+### FASTQC of raw reads, generate summary
 
 ## ChIP-seq analysis
 1. Sequences were aligned using Bowtie v2.1.0, allowing for ≤2 mismatches to the reference in 50bp.
