@@ -28,4 +28,6 @@ multiBigwigSummary bins -b *.bw -out .npz --outRawCounts scores_per_transcript.t
 5. Alternative splicing was quantified using the percent spliced in (PSI) metric using Multivariate Analysis of Transcript Splicing (rMATS, v3.2.4). For each event, rMATS reports counts supporting the inclusion (I) or splicing (S) of an event. To reduce spurious events due to low counts, we required all of the samples to have I ≥ 10 and S ≥ 10. For these events, the PSI is calculated as PSI = I/(I + S).
 
 6. IGV was used to visualize sequencing coverage.
+```unix
 toTDF .wig .tdf mm9
+```

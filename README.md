@@ -1,4 +1,4 @@
-# S3EQ_of_neuronal_epigenome_and_transcriptome
+# S3EQ of neuronal epigenome and transcriptome
 
 ## BACKGROUND:
 High-throughput sequencing has been widely applied to uncover the molecular mechanisms underlying neurological and psychiatric disorders. The large body of data supports the role of epigenetic mechanisms in neurological function of both human and animals. Yet, the existing data is limited by the fact that epigenetic and transcriptomic changes have only been measured in separate cohorts, this has limited precise correlation of measured epigenetic perturbations to changes in gene expression.
